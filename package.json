@@ -1,10 +1,10 @@
 {
-  "name": "@mckoy03/payload-builder",
+  "name": "payload-builder",
   "version": "0.1.3",
   "description": "",
   "main": "index.js",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@mckoy03"
+    "@mckoy03:registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
