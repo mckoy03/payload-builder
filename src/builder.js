@@ -8,7 +8,7 @@ const _isEmpty = (val) => {
  * @param {object} __source // data source from database
  * @returns // data to return based on the __data_format
  */
-const builder = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => {
+const compile = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => {
     var response_data = undefined
 
     function checkifObject(__format) {
@@ -18,31 +18,21 @@ const builder = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => 
     function checkCriteria(__criterias, __source_item_data) {
         const criteria = Object.keys(__criterias)
         var __data_object = {}
-// logger('criteria',criteria)
 
         // Check if the source data and output data is in array
         if (criteria.indexOf('array_source') !== -1 && criteria.indexOf('content') !== -1) {
-// logger('>>> __criterias:', __criterias)
             let array_source = __criterias.array_source
             let content_criterias = [__criterias.content] // enclosed in array, for multiple entry compiling
-// logger('__source_item_data', __source_item_data)
-// logger('has content:', content_criterias)
-// logger('has array_source: ', array_source)
-// logger('array_source data:', __source_item_data[array_source])
 
             let __new_data = compile(content_criterias, __source_item_data[array_source]);
-// logger('__new_data', __new_data)
             return __new_data
             // don't proceed below;
         }
 
         criteria.forEach((__field, __index) => {
             let criterion = __criterias[__field]
-// logger('__source_item_data', __source_item_data)
-// logger('criterion', criterion)
             // check if required object or array
             let criterion_data_type = checkifObject(criterion)
-// logger('criterion_data_type', criterion_data_type)
             if (['array', 'object'].indexOf(criterion_data_type) !== -1) {
                 switch(criterion_data_type) {
                     // for array format data on criterion __field
@@ -103,7 +93,7 @@ const builder = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => 
 
                             _concat_value += _field_data
                         })
-                        _value = _concat_value //`${__source_item_data[concat_fields[0]]}${__source_item_data[concat_fields[1]]}`
+                        _value = _concat_value 
                         break
                     
                     case 'cond': // conditional
@@ -136,12 +126,9 @@ const builder = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => 
 
             // check if criterion is an object with . pointer
             let __obj_criterion = criterion.split('.')
-// logger('__field', __field)
-// logger('__obj_criterion', __obj_criterion)
             // find the the (array_source=__obj_criterion[0]) from `__source_item_data` and named as `__array_source`
             if (__obj_criterion.length > 1) {
                 // check first criterion field if has array indicator
-// logger('__obj_criterion[0]', __obj_criterion[0])
                 if (__obj_criterion[0].indexOf("[]") !== -1) {
                     /**
                      * // TODO: SHOULD BE REMOVING THIS SECTION
@@ -149,9 +136,7 @@ const builder = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => 
                     let spliced_crit_field = __obj_criterion[0].split('')
                     spliced_crit_field.splice((spliced_crit_field.length -2), spliced_crit_field.length)
                     spliced_crit_field = spliced_crit_field.join('')
-// logger('spliced_crit_field', spliced_crit_field)
 
-// logger('__source_item_data[__obj_criterion[0]]', __obj_criterion[0], spliced_crit_field, __source_item_data[spliced_crit_field])
                     // source item data with current field is an array
                     __source_item_data[spliced_crit_field].map(__source_item_crit_element => {
                         let __source_item_crit_data = __source_item_crit_element
@@ -159,7 +144,6 @@ const builder = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => 
                         __obj_criterion.forEach((__crit_field, __idx) => {
                             if (__idx > 0) {// skip the array, since it already inside its element
                                 __source_item_crit_data = __source_item_crit_data[__crit_field] 
-// logger(__crit_field, __source_item_crit_data)
                             }
                         })
 
@@ -235,5 +219,5 @@ const builder = (__data_format = event_data, __source = SAMPLE_EVENTS_ARRAY) => 
 
 
 module.exports = {
-    builder
+    builder: compile
 }
