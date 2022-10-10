@@ -1,8 +1,3 @@
-const init = function (_mod) {
-  console.log("Initialized " + _mod + "")
-}
+const compiler = require('./src/builder')
 
-
-module.exports = {
-  init
-}
+module.exports = compiler
